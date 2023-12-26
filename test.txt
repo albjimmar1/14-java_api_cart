@@ -1,0 +1,19 @@
+http://localhost:8080/swagger-ui/index.html
+
+La prueba consiste en crear una aplicación back end para un e-commerce,
+Es un comercio electrónico sencillo que debería poder
+● Crear un carrito (que contendrá productos).
+● Obtener información de un carrito dada su identificación.
+● Agregue uno o más productos a ese carrito. Un producto consiste
+de las siguientes propiedades:
+○ Identificación (numérica)
+○ Descripción (alfanumérica)
+○ Cantidad (numérica)
+● Eliminar un carrito.
+● El almacenamiento de aplicaciones DEBE implementarse sin utilizar un
+motor de base de datos. DEBE ser volátil, no te preocupes por la aplicación
+se reinicia.
+El carro tiene condiciones, vive en la memoria (no se requiere almacenamiento), está
+volátil y tiene un TTL de 10 minutos.
+Para implementar y resolver el desafío solo tienes uno
+Requisito... ¡usa Java! Siéntete libre en todas las demás opciones.
