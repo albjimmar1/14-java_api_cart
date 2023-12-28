@@ -4,6 +4,7 @@ import com.example.ecommerce.EcommerceApplication;
 import com.example.ecommerce.models.Cart;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,10 +12,14 @@ import java.util.Optional;
 public class CartRepository {
 
     public List<Cart> findAll() {
+        deleteLastRecordsJob();
+
         return EcommerceApplication.dbCarts;
     }
 
     public Optional<Cart> findById(Integer id) {
+        deleteLastRecordsJob();
+
         Optional<Cart> result = Optional.empty();
 
         for (Cart cart : EcommerceApplication.dbCarts) {
@@ -27,43 +32,60 @@ public class CartRepository {
     }
 
     public boolean add(Cart cart) {
+        deleteLastRecordsJob();
 
         if (this.findAll().stream().anyMatch(c -> cart.getId().equals(c.getId()))) {
             return false;
         }
 
+        cart.setLastUpdate(new Date());
+
         return EcommerceApplication.dbCarts.add(cart);
     }
 
     public Optional<Cart> update(Cart cart) {
+        deleteLastRecordsJob();
+
         Optional<Cart> cartToUpdate = this.findById(cart.getId());
-        cartToUpdate.ifPresent(p -> EcommerceApplication.dbCarts.set(
-                EcommerceApplication.dbCarts.indexOf(p), cart));
+        cart.setLastUpdate(new Date());
+        cartToUpdate.ifPresent(c -> EcommerceApplication.dbCarts.set(
+                EcommerceApplication.dbCarts.indexOf(c), cart));
 
         return cartToUpdate.isPresent() ? Optional.of(cart) : Optional.empty();
     }
 
     public Optional<Cart> partialUpdate(Cart cart) {
+        deleteLastRecordsJob();
+
         Optional<Cart> finalCart = Optional.empty();
         Optional<Cart> cartToUpdate = this.findById(cart.getId());
 
         if (cartToUpdate.isPresent()) {
-            Cart p = cartToUpdate.get();
+            Cart c = cartToUpdate.get();
 
             if (cart.getProducts() != null) {
-                p.setProducts(cart.getProducts());
+                c.setProducts(cart.getProducts());
+                c.setLastUpdate(new Date());
             }
 
-            finalCart = Optional.of(p);
+            finalCart = Optional.of(c);
         }
 
         return finalCart;
     }
 
     public boolean delete(Integer id) {
+        deleteLastRecordsJob();
+
         Optional<Cart> cartToDelete = this.findById(id);
-        cartToDelete.ifPresent(p -> EcommerceApplication.dbCarts.remove(p));
+        cartToDelete.ifPresent(c -> EcommerceApplication.dbCarts.remove(c));
 
         return cartToDelete.isPresent();
+    }
+
+    private void deleteLastRecordsJob() {
+        List<Cart> elementsToDelete = EcommerceApplication.dbCarts.stream().filter(c -> new Date().getTime() - c.getLastUpdate().getTime() > EcommerceApplication.PROPERTY_TTL).toList();
+
+        EcommerceApplication.dbCarts.removeAll(elementsToDelete);
     }
 }

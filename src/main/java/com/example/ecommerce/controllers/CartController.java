@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/ecommerce/v1")
 public class CartController {
@@ -74,8 +76,8 @@ public class CartController {
     }
 
     @PatchMapping("/carts/{idCart}/products")
-    public ResponseEntity<Object> addProductToCart(@PathVariable Integer idCart, @RequestBody Product product) {
-        ResponseBuilder response = this.cartService.addProduct(idCart, product);
+    public ResponseEntity<Object> addProductsToCart(@PathVariable Integer idCart, @RequestBody List<Product> products) {
+        ResponseBuilder response = this.cartService.addProduct(idCart, products);
 
         return new ResponseEntity<>(response, response.getStatus());
     }

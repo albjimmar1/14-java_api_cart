@@ -5,6 +5,8 @@ Carts can be created and deleted using their endpoints.<br>
 Products can be added and removed from the cart using their endpoints.<br>
 The API is documented with Swagger UI.
 
+[Documentation in local deployment](http://localhost:8080/swagger-ui/index.html)
+
 # Technologies
 
 Java<br>

@@ -35,19 +35,17 @@ public class CartService {
     }
 
     public ResponseBuilder add(Cart cart) {
-        List<String> errors = new ArrayList<>();
 
-        if (cart.getId() == null)
-            errors.add("Cart id is required");
-        if (cart.getProducts() == null)
-            errors.add("Cart products are required");
-
-        if (!errors.isEmpty()) {
+        if (cart.getId() == null || cart.getId() < 0 || cart.getProducts() == null
+                || cart.getProducts().stream().anyMatch(p -> p.getId() == null
+                || p.getId() < 0 || (p.getAmount() != null && p.getAmount() < 0))) {
             return new ResponseBuilder(
                     cart,
                     HttpStatus.BAD_REQUEST
             );
         }
+
+        cart.getProducts().stream().filter(c -> c.getAmount() == null).forEach(c -> c.setAmount(1));
 
         if (this.cartRepository.add(cart)) {
             return new ResponseBuilder(cart, HttpStatus.CREATED);
@@ -57,17 +55,14 @@ public class CartService {
     }
 
     public ResponseBuilder update(Cart cart, Integer urlId) {
-        List<String> errors = new ArrayList<>();
 
-        if (cart.getId() == null)
-            errors.add("Cart id is required");
-        if (!Objects.equals(cart.getId(), urlId))
-            errors.add("Cart id and url id must be the same");
-
-        if (!errors.isEmpty()) {
+        if (cart.getId() == null || !Objects.equals(cart.getId(), urlId) || cart.getProducts() == null
+                || cart.getProducts().stream().anyMatch(p -> p.getId() == null
+                || p.getId() < 0 || (p.getAmount() != null && p.getAmount() < 0))) {
             return new ResponseBuilder(cart, HttpStatus.BAD_REQUEST);
         }
 
+        cart.getProducts().stream().filter(c -> c.getAmount() == null).forEach(c -> c.setAmount(1));
         Optional<Cart> result = this.cartRepository.update(cart);
 
         return new ResponseBuilder(
@@ -78,17 +73,13 @@ public class CartService {
 
     public ResponseBuilder partialUpdate(Cart cart, Integer urlId) {
 
-        List<String> errors = new ArrayList<>();
-
-        if (cart.getId() == null)
-            errors.add("Cart id is required");
-        if (!Objects.equals(cart.getId(), urlId))
-            errors.add("Cart id and url id must be the same");
-
-        if (!errors.isEmpty()) {
+        if (cart.getId() == null || !Objects.equals(cart.getId(), urlId) || cart.getProducts() == null
+                || cart.getProducts().stream().anyMatch(p -> p.getId() == null
+                || p.getId() < 0 || (p.getAmount() != null && p.getAmount() < 0))) {
             return new ResponseBuilder(cart, HttpStatus.BAD_REQUEST);
         }
 
+        cart.getProducts().stream().filter(c -> c.getAmount() == null).forEach(c -> c.setAmount(1));
         Optional<Cart> result = this.cartRepository.partialUpdate(cart);
 
         return new ResponseBuilder(
@@ -117,15 +108,8 @@ public class CartService {
     public ResponseBuilder findProductById(Integer idCart, Integer idProduct) {
         Optional<Cart> result = this.cartRepository.findById(idCart);
         Optional<Product> product = Optional.empty();
-        List<String> errors = new ArrayList<>();
 
-        if (result.isEmpty()) {
-            errors.add("Cart not found");
-        } else if (result.get().getProducts() == null) {
-            errors.add("Cart does not contain products");
-        }
-
-        if (errors.isEmpty()) {
+        if (result.isPresent() && result.get().getProducts() != null) {
             product = result.get().getProducts().stream().filter(p -> Objects.equals(p.getId(), idProduct)).findFirst();
         }
 
@@ -135,29 +119,33 @@ public class CartService {
         );
     }
 
-    public ResponseBuilder addProduct(Integer idCart, Product product) {
+    public ResponseBuilder addProduct(Integer idCart, List<Product> products) {
         Optional<Cart> result = this.cartRepository.findById(idCart);
         Optional<Cart> finalResult = Optional.empty();
 
-        if (product.getId() == null || (product.getAmount() != null && product.getAmount() <= 0))
-            return new ResponseBuilder(product, HttpStatus.BAD_REQUEST);
-        if (product.getAmount() == null)
-            product.setAmount(1);
+        for (Product p : products) {
+            if (p.getId() == null || (p.getAmount() != null && p.getAmount() < 0))
+                return new ResponseBuilder(p, HttpStatus.BAD_REQUEST);
+            if (p.getAmount() == null)
+                p.setAmount(1);
+        }
 
         if (result.isPresent()) {
              Cart cartToUpdate = new Cart(result.get());
             if (result.get().getProducts() == null) {
-                cartToUpdate.setProducts(List.of(product));
+                cartToUpdate.setProducts(products);
             } else {
                 boolean newProduct = true;
-                for (Product p : cartToUpdate.getProducts()) {
-                    if (Objects.equals(p.getId(), product.getId())) {
-                        p.setAmount(p.getAmount() + product.getAmount());
-                        newProduct = false;
+                for (Product productToAdd : products) {
+                    for (Product p : cartToUpdate.getProducts()) {
+                        if (Objects.equals(p.getId(), productToAdd.getId())) {
+                            p.setAmount(p.getAmount() + productToAdd.getAmount());
+                            newProduct = false;
+                        }
                     }
+                    if (newProduct)
+                        cartToUpdate.getProducts().add(productToAdd);
                 }
-                if (newProduct)
-                    cartToUpdate.getProducts().add(product);
             }
             finalResult = this.cartRepository.partialUpdate(cartToUpdate);
         }
@@ -173,7 +161,7 @@ public class CartService {
         Optional<Cart> finalResult = Optional.empty();
 
         if ((product.getId() != null && !Objects.equals(product.getId(), idProduct))
-                || (product.getAmount() != null && product.getAmount() <= 0))
+                || (product.getAmount() != null && product.getAmount() < 0))
             return new ResponseBuilder(product, HttpStatus.BAD_REQUEST);
 
         if (result.isPresent() && result.get().getProducts() != null) {
