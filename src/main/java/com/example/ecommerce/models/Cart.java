@@ -1,11 +1,11 @@
 package com.example.ecommerce.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 public class Cart {
+
+    public static int index = 0;
 
     private Integer id;
 
@@ -50,5 +50,9 @@ public class Cart {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public static Integer generateId() {
+        return index++;
     }
 }

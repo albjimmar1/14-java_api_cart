@@ -1,7 +1,6 @@
 package com.example.ecommerce;
 
 import com.example.ecommerce.models.Cart;
-import com.example.ecommerce.models.Product;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
@@ -19,7 +18,7 @@ public class EcommerceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(EcommerceApplication.class, args);
-;
+
 		EcommerceApplication.dbCarts = new ArrayList<>();
 	}
 

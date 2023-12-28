@@ -36,7 +36,9 @@ public class CartService {
 
     public ResponseBuilder add(Cart cart) {
 
-        if (cart.getId() == null || cart.getId() < 0 || cart.getProducts() == null
+        cart.setId(Cart.generateId());
+
+        if (cart.getProducts() == null
                 || cart.getProducts().stream().anyMatch(p -> p.getId() == null
                 || p.getId() < 0 || (p.getAmount() != null && p.getAmount() < 0))) {
             return new ResponseBuilder(
