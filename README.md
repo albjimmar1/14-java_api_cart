@@ -1,19 +1,19 @@
 # Shopping card
 
-RESTfull API to manage shopping carts.<br>
+RESTful API to manage shopping carts.<br>
 Carts can be created and deleted using their endpoints.<br>
 Products can be added and removed from the cart using their endpoints.<br>
-The API is documented with Swagger UI.
+The API is documented with Openapi and Swagger.
 
 [Documentation in local deployment](http://localhost:8080/swagger-ui/index.html)
 
 # Technologies
 
 Java<br>
-Spring web<br>
+Spring<br>
 Maven<br>
+Openapi<br>
 Swagger<br>
-Firebase<br>
 
 # Installation
 
