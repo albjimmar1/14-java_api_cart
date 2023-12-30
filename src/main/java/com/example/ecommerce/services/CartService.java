@@ -126,7 +126,7 @@ public class CartService {
         Optional<Cart> finalResult = Optional.empty();
 
         for (Product p : products) {
-            if (p.getId() == null || (p.getAmount() != null && p.getAmount() < 0))
+            if (p.getId() == null || p.getId() < 0 || (p.getAmount() != null && p.getAmount() < 0))
                 return new ResponseBuilder(p, HttpStatus.BAD_REQUEST);
             if (p.getAmount() == null)
                 p.setAmount(1);
@@ -162,7 +162,7 @@ public class CartService {
         Optional<Cart> result = this.cartRepository.findById(idCart);
         Optional<Cart> finalResult = Optional.empty();
 
-        if ((product.getId() != null && !Objects.equals(product.getId(), idProduct))
+        if ((product.getId() != null && (!Objects.equals(product.getId(), idProduct) || product.getId() < 0))
                 || (product.getAmount() != null && product.getAmount() < 0))
             return new ResponseBuilder(product, HttpStatus.BAD_REQUEST);
 

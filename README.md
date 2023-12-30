@@ -21,7 +21,7 @@ Firebase<br>
 git clone https://github.com/albjimmar1/14-java_api_cart.git
 ```
 ```sh
-cd ecommerce
+cd 14-java_api_cart
 ```
 ```sh
 mvn clean install
