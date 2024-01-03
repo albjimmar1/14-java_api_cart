@@ -9,7 +9,7 @@ The API is documented with Openapi and Swagger.
 
 # Technologies
 
-Java<br>
+Java 17<br>
 Spring<br>
 Maven<br>
 Openapi<br>
